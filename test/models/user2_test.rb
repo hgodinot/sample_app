@@ -38,12 +38,24 @@ class User2Test < ActiveSupport::TestCase
     end
   end
 
-  test "invalid addresses should not be acceped" do
+  test "invalid addresses should not be accepted" do
     invalid_addresses = %w[user@example,com user_at_foo.org user.name@example. 
                            foo@bar_baz.com foo@bar+baz.com foo@bar..com]
     invalid_addresses.each do |invalid_address|
       @user.email = invalid_address
       assert_not @user.valid?
     end
+  end
+
+  test "addresses shoud be unique" do
+    duplicate_user = @user.dup
+    @user.save
+    assert_not duplicate_user.valid?
+  end
+
+  test "addresses are saved downcased" do
+    @user.email = "foo@bar.com".upcase
+    @user.save
+    assert_equal "foo@bar.com", @user.reload.email
   end
 end
